@@ -19,16 +19,16 @@ export default function SuggestionPanel({
   return (
     <div
       id="painel-sugestoes"
-      className="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-40 animate-slide-in-right overflow-y-auto"
+      className="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-40 animate-slide-in-right overflow-y-auto dark:bg-gray-800"
     >
-      <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white">
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between sticky top-0 bg-white dark:bg-gray-800">
         <div className="flex items-center gap-2">
-          <Lightbulb className="w-5 h-5 text-[#2703A6]" />
-          <h2 className="text-xl font-semibold text-gray-800">Sugestões</h2>
+          <Lightbulb className="w-5 h-5 text-[#2703A6] dark:text-blue-300" />
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Sugestões</h2>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
+          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -41,17 +41,17 @@ export default function SuggestionPanel({
             id={`suggestion-card-${sugestao.id}`}
             className={`p-4 rounded-xl border transition-all duration-200 ${
               sugestao.aplicada
-                ? 'bg-green-50 border-green-200'
-                : 'bg-white border-gray-200 hover:border-[#4945BF] hover:shadow-md'
+                ? 'bg-green-50 border-green-200 dark:bg-green-900/50 dark:border-green-800'
+                : 'bg-white border-gray-200 hover:border-[#4945BF] hover:shadow-md dark:bg-gray-700 dark:border-gray-600 dark:hover:border-[#4945BF]'
             }`}
           >
-            <p className="text-sm text-gray-700 mb-3">{sugestao.texto}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-200 mb-3">{sugestao.texto}</p>
             <button
               onClick={() => onApply(sugestao.id)}
               disabled={sugestao.aplicada}
               className={`w-full py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 sugestao.aplicada
-                  ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200 cursor-not-allowed'
                   : 'bg-[#2703A6] text-white hover:bg-[#201AD9] hover:shadow-md'
               }`}
             >
