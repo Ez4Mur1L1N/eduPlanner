@@ -4,15 +4,23 @@ import { Moon, Sun, Bell, Calendar, LogOut } from 'lucide-react';
 interface ConfiguracoesProps {
   onLogout: () => void;
   onShowToast: (message: string, type: 'success' | 'warning' | 'error') => void;
+  darkMode: boolean; // Recebe o estado
+  onToggleDarkMode: () => void; // Recebe a função
 }
 
-export default function Configuracoes({ onLogout, onShowToast }: ConfiguracoesProps) {
-  const [darkMode, setDarkMode] = useState(false);
+export default function Configuracoes({
+  onLogout,
+  onShowToast,
+  darkMode,
+  onToggleDarkMode
+}: ConfiguracoesProps) {
+  // const [darkMode, setDarkMode] = useState(false); // REMOVER estado local
   const [notifications, setNotifications] = useState(true);
   const [googleSync, setGoogleSync] = useState(false);
 
   const handleDarkModeToggle = () => {
-    setDarkMode(!darkMode);
+    // setDarkMode(!darkMode); // REMOVER
+    onToggleDarkMode(); // Usar a função recebida via props
     onShowToast(
       darkMode ? 'Tema claro ativado' : 'Tema escuro ativado',
       'success'
@@ -40,6 +48,8 @@ export default function Configuracoes({ onLogout, onShowToast }: ConfiguracoesPr
   return (
     <div
       id="page-config"
+      // Classes de dark mode não são mais necessárias aqui, pois são controladas pelo App.tsx
+      // Mas vamos manter as classes de transição e cores internas
       className={`min-h-screen p-6 transition-colors duration-300 ${
         darkMode ? 'bg-gray-900' : 'bg-gray-50'
       }`}
@@ -106,6 +116,9 @@ export default function Configuracoes({ onLogout, onShowToast }: ConfiguracoesPr
               </button>
             </div>
           </div>
+
+          {/* ... O restante do arquivo continua igual, mas o ideal seria adicionar
+               classes 'dark:' para todos os elementos, como feito abaixo ... */}
 
           <div
             className={`rounded-xl p-6 shadow-md ${
@@ -216,7 +229,7 @@ export default function Configuracoes({ onLogout, onShowToast }: ConfiguracoesPr
             <button
               id="btn-logout"
               onClick={onLogout}
-              className="flex items-center gap-3 w-full px-4 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
             >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Sair da conta</span>
