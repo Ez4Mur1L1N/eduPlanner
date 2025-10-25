@@ -36,15 +36,15 @@ export default function ProfessorCard({
       onDragStart={(e) => onDragStart(e, professor)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg cursor-move transition-all duration-200 hover:scale-[1.02] border border-gray-100"
+      className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg cursor-move transition-all duration-200 hover:scale-[1.02] border border-gray-100 dark:bg-gray-800 dark:border-gray-700"
     >
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2703A6] to-[#4945BF] flex items-center justify-center">
           <User className="w-6 h-6 text-white" />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-800">{professor.nome}</h3>
-          <p className="text-xs text-gray-500">{diasAbreviados}</p>
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100">{professor.nome}</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{diasAbreviados}</p>
         </div>
       </div>
     </div>
