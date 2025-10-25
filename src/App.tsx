@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Importe o useEffect
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Professores from './pages/Professores';
@@ -23,6 +23,18 @@ function App() {
   const [sugestoes, setSugestoes] = useState<Sugestao[]>(initialSugestoes);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [toastCounter, setToastCounter] = useState(0);
+
+  // 1. Estado do modo escuro movido para cá
+  const [darkMode, setDarkMode] = useState(false);
+
+  // 2. useEffect para aplicar a classe 'dark' no HTML
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const showToast = (message: string, type: 'success' | 'warning' | 'error') => {
     const newToast: Toast = {
@@ -60,11 +72,13 @@ function App() {
   };
 
   if (!isLoggedIn) {
+    // Passando o darkMode para a página de Login também
     return <Login onLogin={handleLogin} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    // 3. Aplicar classes de fundo globais que reagem ao dark mode
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />
 
       {currentPage === 'dashboard' && (
@@ -94,7 +108,13 @@ function App() {
       )}
 
       {currentPage === 'config' && (
-        <Configuracoes onLogout={handleLogout} onShowToast={showToast} />
+        // 4. Passar o estado e a função de toggle para a página de Configurações
+        <Configuracoes
+          onLogout={handleLogout}
+          onShowToast={showToast}
+          darkMode={darkMode}
+          onToggleDarkMode={() => setDarkMode(!darkMode)}
+        />
       )}
 
       <ToastContainer toasts={toasts} onClose={closeToast} />
