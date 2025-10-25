@@ -62,15 +62,32 @@ export default function Dashboard({
     const existingAula = aulas.find((a) => a.dia === dia && a.hora === hora);
 
     if (draggedProfessor) {
-      const professorConflict = aulas.some(
-        (a) => a.professor === draggedProfessor.nome && a.hora === hora && a.dia !== dia
-      );
+      // *** INÍCIO DA MODIFICAÇÃO ***
+      // 1. Verificar disponibilidade do professor
+      const diaAbrev = dia.toLowerCase().slice(0, 3);
+      const isAvailable = draggedProfessor.disponibilidade.includes(`${diaAbrev}-${hora}`);
 
-      if (existingAula && existingAula.professor) {
-        onShowToast('Conflito de horário detectado', 'error');
+      // 2. Se não estiver disponível, mostrar erro e parar
+      if (!isAvailable) {
+        onShowToast('Professor indisponível nesse horário', 'error');
         setDraggedProfessor(null);
         return;
       }
+
+      // 3. Remover a verificação de 'professorConflict' antiga e incorreta
+      /*
+      const professorConflict = aulas.some(
+        (a) => a.professor === draggedProfessor.nome && a.hora === hora && a.dia !== dia
+      );
+      */
+
+      // A verificação de conflito existente (se já há um professor no slot) está correta
+      if (existingAula && existingAula.professor) {
+        onShowToast('Já existe um professor alocado neste horário', 'error');
+        setDraggedProfessor(null);
+        return;
+      }
+      // *** FIM DA MODIFICAÇÃO ***
 
       const newAulas = existingAula
         ? aulas.map((a) =>
@@ -95,12 +112,13 @@ export default function Dashboard({
     }
 
     if (draggedSala) {
+      // Lógica da sala (mantida)
       const salaConflict = aulas.some(
         (a) => a.sala === draggedSala.nome && a.hora === hora && a.dia !== dia
       );
 
       if (salaConflict) {
-        onShowToast('Essa sala já está alocada', 'error');
+        onShowToast('Essa sala já está alocada em outro dia neste horário', 'error');
         setDraggedSala(null);
         return;
       }
@@ -132,7 +150,7 @@ export default function Dashboard({
     onAddProfessor({
       nome: novoProfessor.nome,
       email: novoProfessor.email,
-      disponibilidade: ['seg-19h00', 'qua-19h00']
+      disponibilidade: ['seg-19h00', 'qua-19h00'] // Disponibilidade padrão
     });
 
     setNovoProfessor({ nome: '', email: '' });
@@ -146,7 +164,8 @@ export default function Dashboard({
     onAddSala({
       nome: novaSala.nome,
       capacidade: parseInt(novaSala.capacidade),
-      tipo: novaSala.tipo
+      tipo: novaSala.tipo,
+      equipamentos: [] // Adicionado para conformar com o tipo
     });
 
     setNovaSala({ nome: '', capacidade: '', tipo: 'Sala' });
@@ -169,11 +188,12 @@ export default function Dashboard({
   };
 
   return (
-    <div id="page-dashboard" className="min-h-screen bg-gray-50 p-6">
+    // Adicionando classes de dark mode
+    <div id="page-dashboard" className="min-h-screen p-6">
       <div className="max-w-[1800px] mx-auto grid grid-cols-12 gap-6">
         <div id="dashboard-professores" className="col-span-3 space-y-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Professores</h2>
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Professores</h2>
             <button
               onClick={() => setShowSuggestions(!showSuggestions)}
               className="p-2 rounded-lg bg-[#2703A6] text-white hover:bg-[#201AD9] transition-colors"
@@ -197,7 +217,7 @@ export default function Dashboard({
               <button
                 id="btn-add-professor"
                 onClick={() => setShowAddProfessor(true)}
-                className="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 flex items-center justify-center gap-2 text-gray-600 hover:border-[#4945BF] hover:text-[#4945BF] transition-all duration-200"
+                className="w-full bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 hover:border-[#4945BF] hover:text-[#4945BF] dark:hover:border-[#4945BF] dark:hover:text-[#4945BF] transition-all duration-200"
               >
                 <Plus className="w-5 h-5" />
                 <span className="font-medium">Adicionar professor</span>
@@ -205,26 +225,26 @@ export default function Dashboard({
             ) : (
               <div
                 id="form-professor"
-                className="bg-white rounded-xl p-4 space-y-3 border border-gray-200 animate-fade-in"
+                className="bg-white dark:bg-gray-800 rounded-xl p-4 space-y-3 border border-gray-200 dark:border-gray-700 animate-fade-in"
               >
                 <input
                   type="text"
                   placeholder="Nome completo"
                   value={novoProfessor.nome}
                   onChange={(e) => setNovoProfessor({ ...novoProfessor, nome: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
                 />
                 <input
                   type="email"
                   placeholder="E-mail"
                   value={novoProfessor.email}
                   onChange={(e) => setNovoProfessor({ ...novoProfessor, email: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => setShowAddProfessor(false)}
-                    className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors"
+                    className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 transition-colors"
                   >
                     Cancelar
                   </button>
@@ -242,15 +262,15 @@ export default function Dashboard({
         </div>
 
         <div id="grade-horarios" className="col-span-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Grade de Horários</h2>
-          <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Grade de Horários</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
             <div className="grid grid-cols-6 gap-3">
-              <div className="font-semibold text-gray-700 text-center text-sm"></div>
+              <div className="font-semibold text-gray-700 dark:text-gray-300 text-center text-sm"></div>
               {diasSemana.map((dia) => (
                 <div
                   key={dia}
                   id={`col-${dia.toLowerCase()}`}
-                  className="font-semibold text-gray-700 text-center text-sm"
+                  className="font-semibold text-gray-700 dark:text-gray-300 text-center text-sm"
                 >
                   {dia}
                 </div>
@@ -261,7 +281,7 @@ export default function Dashboard({
                   <div
                     key={`label-${hora}`}
                     id={`slot-${hora}`}
-                    className="font-medium text-gray-600 text-sm flex items-center justify-center"
+                    className="font-medium text-gray-600 dark:text-gray-400 text-sm flex items-center justify-center"
                   >
                     {hora}
                   </div>
@@ -288,7 +308,7 @@ export default function Dashboard({
         </div>
 
         <div id="dashboard-salas" className="col-span-3">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Salas</h2>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Salas</h2>
           <div className="grid grid-cols-2 gap-3 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
             {salas.map((sala) => (
               <SalaCard key={sala.id} sala={sala} onDragStart={handleSalaDragStart} />
@@ -298,7 +318,7 @@ export default function Dashboard({
               <button
                 id="btn-add-sala"
                 onClick={() => setShowAddSala(true)}
-                className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-gray-600 hover:border-[#4945BF] hover:text-[#4945BF] transition-all duration-200"
+                className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-gray-600 dark:text-gray-400 hover:border-[#4945BF] hover:text-[#4945BF] dark:hover:border-[#4945BF] dark:hover:text-[#4945BF] transition-all duration-200"
               >
                 <Plus className="w-6 h-6" />
                 <span className="text-sm font-medium">Adicionar sala</span>
@@ -306,19 +326,19 @@ export default function Dashboard({
             ) : (
               <div
                 id="form-sala"
-                className="col-span-2 bg-white rounded-xl p-4 space-y-3 border border-gray-200 animate-fade-in"
+                className="col-span-2 bg-white dark:bg-gray-800 rounded-xl p-4 space-y-3 border border-gray-200 dark:border-gray-700 animate-fade-in"
               >
                 <input
                   type="text"
                   placeholder="Nome"
                   value={novaSala.nome}
                   onChange={(e) => setNovaSala({ ...novaSala, nome: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
                 />
                 <select
                   value={novaSala.tipo}
                   onChange={(e) => setNovaSala({ ...novaSala, tipo: e.target.value as any })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
                 >
                   <option value="Sala">Sala</option>
                   <option value="Laboratório">Laboratório</option>
@@ -329,12 +349,12 @@ export default function Dashboard({
                   placeholder="Capacidade"
                   value={novaSala.capacidade}
                   onChange={(e) => setNovaSala({ ...novaSala, capacidade: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#2703A6]"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => setShowAddSala(false)}
-                    className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors"
+                    className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 transition-colors"
                   >
                     Cancelar
                   </button>
